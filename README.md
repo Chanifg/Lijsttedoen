@@ -8,6 +8,17 @@
 
 ---
 
+## 📥 Unduh APK Langsung (Siap Pakai)
+
+Bagi Anda yang ingin langsung mencoba aplikasi **Lijsttedoen** di ponsel Android Anda tanpa perlu melakukan kompilasi kode secara manual dari mesin lokal, Anda dapat mengunduh berkas instalasi APK siap pakai yang telah dioptimalkan secara gratis di halaman Rilis resmi kami:
+
+👉 **[Unduh APK Lijsttedoen Terbaru di Halaman Rilis GitHub](https://github.com/Chanifg/Lijsttedoen/releases)**
+
+> [!TIP]
+> Unduh file **`app-arm64-v8a-release.apk`** untuk diinstal langsung ke perangkat Android 10+ modern Anda (tipe CPU 64-bit yang digunakan di hampir semua ponsel saat ini).
+
+---
+
 ## 🎨 Karakter Estetika: Neo-Brutalism
 Aplikasi ini tidak sekadar berfungsi sebagai alat pencatat tugas biasa, melainkan menghadirkan pengalaman visual premium berkat penerapan gaya **Neo-Brutalism**:
 * **High Contrast & Sharp Edges**: Menggunakan batas solid tebal (`4px`) hitam pekat di setiap sisi kartu dan tombol.
@@ -112,8 +123,10 @@ Ikuti panduan berikut untuk menjalankan proyek ini di mesin lokal Anda:
      ```bash
      flutter run
      ```
-   * Untuk melakukan build APK rilis yang efisien (direkomendasikan):
-     Silakan lihat bagian [📦 Panduan Build APK Rilis (Android 10+)](#-panduan-build-apk-rilis-android-10) di bawah ini.
+    * Untuk mengunduh APK siap pakai tanpa kompilasi:
+      Silakan langsung unduh di [Halaman Rilis GitHub](https://github.com/Chanifg/Lijsttedoen/releases).
+    * Untuk melakukan build APK rilis sendiri secara mandiri:
+      Silakan lihat bagian [📦 Panduan Build APK Rilis (Android 10+)](#-panduan-build-apk-rilis-android-10) di bawah ini.
 
 ---
 
