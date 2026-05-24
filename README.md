@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)](#)
 [![Theme](https://img.shields.io/badge/Style-Neo--Brutalism-FFD700.svg?style=flat-square)](#)
 
-**Lijsttedoen** (diambil dari bahasa Belanda yang berarti *"Daftar Tugas"*) adalah aplikasi manajemen tugas (To-Do List) modern dengan pendekatan estetika desain **Neo-Brutalism** yang berani, berkarakter, dan dinamis. Aplikasi ini dirancang untuk memaksimalkan produktivitas harian Anda dengan fitur-fitur canggih, performa luar biasa, serta antarmuka yang sangat atraktif.
+**Lijsttedoen** (diambil dari bahasa Belanda yang berarti *"Daftar Tugas"*) adalah aplikasi manajemen tugas (To-Do List) yang dibuat karena pengembang males sama iklan yang ada di aplikasi playsotre
 
 ---
 
