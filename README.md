@@ -10,21 +10,12 @@
 
 ## 📥 Unduh APK Langsung (Siap Pakai)
 
-Bagi Anda yang ingin langsung mencoba aplikasi **Lijsttedoen** di ponsel Android Anda tanpa perlu melakukan kompilasi kode secara manual dari mesin lokal, Anda dapat mengunduh berkas instalasi APK siap pakai yang telah dioptimalkan secara gratis di halaman Rilis resmi kami:
+Bagi kalian yang pingin nyobain aplikasi **Lijsttedoen** langsung unduh aja link dibawah ini, ngga usah ngecompile manual, udah tak kerjain :
 
 👉 **[Unduh APK Lijsttedoen Terbaru di Halaman Rilis GitHub](https://github.com/Chanifg/Lijsttedoen/releases)**
 
 > [!TIP]
-> Unduh file **`app-arm64-v8a-release.apk`** untuk diinstal langsung ke perangkat Android 10+ modern Anda (tipe CPU 64-bit yang digunakan di hampir semua ponsel saat ini).
-
----
-
-## 🎨 Karakter Estetika: Neo-Brutalism
-Aplikasi ini tidak sekadar berfungsi sebagai alat pencatat tugas biasa, melainkan menghadirkan pengalaman visual premium berkat penerapan gaya **Neo-Brutalism**:
-* **High Contrast & Sharp Edges**: Menggunakan batas solid tebal (`4px`) hitam pekat di setiap sisi kartu dan tombol.
-* **Hard Shadows**: Efek bayangan tegas tanpa *blur* (`Offset(6, 6)`) untuk memberikan sensasi kedalaman retro-modern.
-* **Vibrant HSL Palette**: Kombinasi warna berani seperti *Vibrant Yellow* (Primary Container), *Electric Cyan* (Secondary Container), *Lively Green* (Success Container), dan *Soft Pink* (Error Container).
-* **Premium Typography**: Menggunakan Google Fonts **Bricolage Grotesque** untuk judul yang berani dan ekspresif, serta **Hanken Grotesk** untuk pembacaan teks yang nyaman dan profesional.
+> Unduh file **`app-arm64-v8a-release.apk`** untuk diinstal langsung ke perangkat Android 10+ (tipe CPU 64-bit yang digunakan di hampir semua ponsel saat ini).
 
 ---
 
@@ -132,9 +123,7 @@ Ikuti panduan berikut untuk menjalankan proyek ini di mesin lokal Anda:
 
 ## 📦 Panduan Build APK Rilis (Android 10+)
 
-Aplikasi ini telah dikonfigurasi menggunakan batas minimum versi **Android 10 (API 29)** (`minSdk = 29`) untuk menjamin efisiensi performa terbaik, tingkat keamanan yang tinggi, serta ukuran paket yang minimal.
-
-Gunakan langkah-langkah di bawah ini untuk menghasilkan file APK dengan ukuran yang paling efisien:
+Pake cara ini kalo kalian pingin jalan ribet buat pakai aplikasi ini:
 
 ### 1. Build APK Terpisah per Arsitektur CPU (Sangat Direkomendasikan)
 Secara default, perintah `flutter build apk` menggabungkan semua arsitektur CPU ke dalam satu file APK yang besar (*fat APK*). Untuk membaginya agar ukurannya mengecil drastis hingga **50% lebih kecil**:
