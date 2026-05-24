@@ -138,16 +138,6 @@ Anda akan mendapatkan file APK spesifik arsitektur:
 *   `app-arm64-v8a-release.apk` (Untuk HP modern 64-bit — **gunakan ini untuk diinstal langsung ke perangkat Android 10+ Anda**)
 *   `app-armeabi-v7a-release.apk` (Untuk HP model lama 32-bit)
 
-### 2. Build Android App Bundle (AAB) untuk Google Play Store
-Jika ingin merilis aplikasi secara resmi ke Google Play Store, gunakan format `.aab` agar Google Play secara otomatis membuat APK dengan ukuran terkecil khusus untuk tipe HP pengguna yang mengunduhnya:
-
-```bash
-flutter build appbundle
-```
-
-**Lokasi Hasil Build:**
-`build/app/outputs/bundle/release/app-release.aab`
-
 ### 💡 Fitur Optimasi Ukuran Tersemat (Built-in)
 Konfigurasi file `build.gradle.kts` telah dioptimalkan secara penuh untuk versi rilis dengan mengaktifkan:
 *   `isMinifyEnabled = true` : Membuang kode Java/Kotlin yang tidak terpakai dari library luar (*tree-shaking*) serta menyamarkan nama kelas.
