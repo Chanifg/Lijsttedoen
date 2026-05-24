@@ -248,21 +248,6 @@ class _MainShellState extends State<MainShell> {
     }
   }
 
-  void _openSettings() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SettingsPage(
-          currentUserName: _userName,
-          currentAvatarType: _avatarType,
-          onSaveUserName: _updateUserName,
-          onSaveAvatarType: _updateAvatarType,
-          onResetData: _clearAllData,
-          onRestoreData: _loadAppState,
-        ),
-      ),
-    );
-  }
 
   // Pilihan Halaman (FR-08)
   Widget _buildBody() {
@@ -285,7 +270,6 @@ class _MainShellState extends State<MainShell> {
           onToggleTodo: _toggleTodo,
           onEditTodo: _editTodo,
           onDeleteTodo: _deleteTodo,
-          onSettingsPressed: _openSettings,
         );
       case 1:
         return CalendarPage(
@@ -293,14 +277,21 @@ class _MainShellState extends State<MainShell> {
           userName: _userName,
           avatarType: _avatarType,
           onToggleTodo: _toggleTodo,
-          onSettingsPressed: _openSettings,
         );
       case 2:
         return StatsPage(
           todos: _todos,
           userName: _userName,
           avatarType: _avatarType,
-          onSettingsPressed: _openSettings,
+        );
+      case 3:
+        return SettingsPage(
+          currentUserName: _userName,
+          currentAvatarType: _avatarType,
+          onSaveUserName: _updateUserName,
+          onSaveAvatarType: _updateAvatarType,
+          onResetData: _clearAllData,
+          onRestoreData: _loadAppState,
         );
       default:
         return const SizedBox.shrink();

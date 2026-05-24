@@ -8,7 +8,6 @@ class CalendarPage extends StatefulWidget {
   final String userName;
   final String avatarType;
   final Function(TodoModel) onToggleTodo;
-  final VoidCallback onSettingsPressed;
 
   const CalendarPage({
     super.key,
@@ -16,7 +15,6 @@ class CalendarPage extends StatefulWidget {
     required this.userName,
     required this.avatarType,
     required this.onToggleTodo,
-    required this.onSettingsPressed,
   });
 
   @override
@@ -95,79 +93,45 @@ class _CalendarPageState extends State<CalendarPage> {
                   backgroundColor: NeoBrutalismTheme.surface,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      BrutalAvatar(
+                        avatarType: widget.avatarType,
+                        userName: widget.userName,
+                        size: 48,
+                      ),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            BrutalAvatar(
-                              avatarType: widget.avatarType,
-                              userName: widget.userName,
-                              size: 48,
+                            Text(
+                              widget.todos.isEmpty
+                                  ? "0 tasks left"
+                                  : "$activeCount tasks left",
+                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 22,
+                                    height: 1.1,
+                                  ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.todos.isEmpty
-                                        ? "0 tasks left"
-                                        : "$activeCount tasks left",
-                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 22,
-                                          height: 1.1,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: NeoBrutalismTheme.tertiaryContainer, // Lively Green
-                                      border: Border.all(color: NeoBrutalismTheme.outline, width: 1.5),
-                                      borderRadius: BorderRadius.circular(4),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: NeoBrutalismTheme.tertiaryContainer, // Lively Green
+                                border: Border.all(color: NeoBrutalismTheme.outline, width: 1.5),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                "@${widget.userName}",
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: NeoBrutalismTheme.onSurface,
+                                      fontSize: 11,
                                     ),
-                                    child: Text(
-                                      "@${widget.userName}",
-                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                            fontWeight: FontWeight.w800,
-                                            color: NeoBrutalismTheme.onSurface,
-                                            fontSize: 11,
-                                          ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: widget.onSettingsPressed,
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: NeoBrutalismTheme.outline,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Transform.translate(
-                            offset: const Offset(-2, -2),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: NeoBrutalismTheme.secondaryContainer, // Cyan
-                                border: Border.all(color: NeoBrutalismTheme.outline, width: 2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.settings_outlined,
-                                size: 22,
-                                color: NeoBrutalismTheme.onSurface,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],

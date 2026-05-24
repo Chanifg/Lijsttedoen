@@ -315,15 +315,17 @@ class BrutalGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: CustomPaint(
-            painter: BrutalGridPainter(),
+    return SizedBox.expand(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: BrutalGridPainter(),
+            ),
           ),
-        ),
-        child,
-      ],
+          child,
+        ],
+      ),
     );
   }
 }
@@ -471,6 +473,7 @@ class NeoBrutalismBottomBar extends StatelessWidget {
             _buildNavItem(0, Icons.list_alt, "Tasks", const Color(0xFFFFD700)),
             _buildNavItem(1, Icons.calendar_today, "Calendar", const Color(0xFFACEC6B)),
             _buildNavItem(2, Icons.bar_chart, "Stats", const Color(0xFF7CEAFD)),
+            _buildNavItem(3, Icons.settings, "Settings", const Color(0xFFFF7CEF)),
           ],
         ),
       ),

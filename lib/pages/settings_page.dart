@@ -411,33 +411,35 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Row(
                         children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: NeoBrutalismTheme.outline,
-                                  width: 2.5,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: const [
-                                  BoxShadow(
+                          if (Navigator.canPop(context)) ...[
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
                                     color: NeoBrutalismTheme.outline,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 0,
+                                    width: 2.5,
                                   ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.arrow_back,
-                                color: NeoBrutalismTheme.onSurface,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: NeoBrutalismTheme.outline,
+                                      offset: Offset(2, 2),
+                                      blurRadius: 0,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_back,
+                                  color: NeoBrutalismTheme.onSurface,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
+                            const SizedBox(width: 16),
+                          ],
                           Text(
                             "SETTINGS",
                             style: Theme.of(context).textTheme.headlineSmall

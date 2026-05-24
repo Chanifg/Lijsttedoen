@@ -12,7 +12,6 @@ class TasksPage extends StatefulWidget {
   final Function(TodoModel todo) onToggleTodo;
   final Function(TodoModel todo, String title, String description, String dueTime, String dueDate, String category, bool isDeadline, String? deadlineDate, String? deadlineTime) onEditTodo;
   final Function(TodoModel todo) onDeleteTodo;
-  final VoidCallback onSettingsPressed;
 
   const TasksPage({
     super.key,
@@ -23,7 +22,6 @@ class TasksPage extends StatefulWidget {
     required this.onToggleTodo,
     required this.onEditTodo,
     required this.onDeleteTodo,
-    required this.onSettingsPressed,
   });
 
   @override
@@ -33,6 +31,7 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedPeriod = "All"; // "All", "Weekly", "Monthly", "Year"
+  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -190,135 +189,176 @@ class _TasksPageState extends State<TasksPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Top Header Card (Sesuai Visual Stitch)
-                NeoBrutalismCard(
-                  backgroundColor: NeoBrutalismTheme.surface,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            // Profil Avatar Global
-                            BrutalAvatar(
-                              avatarType: widget.avatarType,
-                              userName: widget.userName,
-                              size: 48,
-                            ),
-                            const SizedBox(width: 12),
-                            // Informasi Status Tugas & Username
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.todos.isEmpty
-                                        ? "0 tasks left"
-                                        : "$activeCount tasks left",
-                                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 22,
-                                          height: 1.1,
+                // Top Header Card with Expanding Search Bar
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  child: NeoBrutalismCard(
+                    backgroundColor: NeoBrutalismTheme.surface,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    child: AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 200),
+                      crossFadeState: _isSearching
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      firstChild: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                // Profil Avatar Global
+                                BrutalAvatar(
+                                  avatarType: widget.avatarType,
+                                  userName: widget.userName,
+                                  size: 48,
+                                ),
+                                const SizedBox(width: 12),
+                                // Informasi Status Tugas & Username
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.todos.isEmpty
+                                            ? "0 tasks left"
+                                            : "$activeCount tasks left",
+                                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 22,
+                                              height: 1.1,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: NeoBrutalismTheme.tertiaryContainer, // Lively Green
+                                          border: Border.all(color: NeoBrutalismTheme.outline, width: 1.5),
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
+                                        child: Text(
+                                          "@${widget.userName}",
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                                fontWeight: FontWeight.w800,
+                                                color: NeoBrutalismTheme.onSurface,
+                                                fontSize: 11,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: NeoBrutalismTheme.tertiaryContainer, // Lively Green
-                                      border: Border.all(color: NeoBrutalismTheme.outline, width: 1.5),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      "@${widget.userName}",
-                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                            fontWeight: FontWeight.w800,
-                                            color: NeoBrutalismTheme.onSurface,
-                                            fontSize: 11,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Tombol Settings Cepat
-                      GestureDetector(
-                        onTap: widget.onSettingsPressed,
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: NeoBrutalismTheme.outline,
-                            borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Transform.translate(
-                            offset: const Offset(-2, -2),
+                          const SizedBox(width: 8),
+                          // Tombol Pencarian
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isSearching = true;
+                              });
+                            },
                             child: Container(
+                              width: 42,
+                              height: 42,
                               decoration: BoxDecoration(
-                                color: NeoBrutalismTheme.secondaryContainer, // Cyan
-                                border: Border.all(color: NeoBrutalismTheme.outline, width: 2),
+                                color: NeoBrutalismTheme.outline,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(
-                                Icons.settings_outlined,
-                                size: 22,
-                                color: NeoBrutalismTheme.onSurface,
+                              child: Transform.translate(
+                                offset: const Offset(-2, -2),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: NeoBrutalismTheme.secondaryContainer, // Cyan
+                                    border: Border.all(color: NeoBrutalismTheme.outline, width: 2),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.search,
+                                    size: 22,
+                                    color: NeoBrutalismTheme.onSurface,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Bar Pencarian Neo-Brutalist Premium
-                Container(
-                  decoration: BoxDecoration(
-                    color: NeoBrutalismTheme.outline,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Transform.translate(
-                    offset: const Offset(-4, -4),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: NeoBrutalismTheme.outline, width: 3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (val) => setState(() {}),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
+                      secondChild: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: NeoBrutalismTheme.outline, width: 2.5),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: TextField(
+                                controller: _searchController,
+                                autofocus: true,
+                                onChanged: (val) => setState(() {}),
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.search, color: NeoBrutalismTheme.outline),
+                                  suffixIcon: _searchController.text.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(Icons.clear, color: NeoBrutalismTheme.outline),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            setState(() {});
+                                          },
+                                        )
+                                      : null,
+                                  hintText: "Cari tugas...",
+                                  hintStyle: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.w600),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  border: InputBorder.none,
+                                ),
+                              ),
                             ),
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search, color: NeoBrutalismTheme.outline),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, color: NeoBrutalismTheme.outline),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() {});
-                                  },
-                                )
-                              : null,
-                          hintText: "Cari tugas...",
-                          hintStyle: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.w600),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: InputBorder.none,
-                        ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Tombol Tutup Pencarian
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isSearching = false;
+                                _searchController.clear();
+                              });
+                            },
+                            child: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: NeoBrutalismTheme.outline,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Transform.translate(
+                                offset: const Offset(-2, -2),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: NeoBrutalismTheme.errorContainer, // Pink/Red Container
+                                    border: Border.all(color: NeoBrutalismTheme.outline, width: 2),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 22,
+                                    color: NeoBrutalismTheme.onSurface,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // Filter Periode Neo-Brutalist
                 Row(
@@ -648,6 +688,7 @@ class _TasksPageState extends State<TasksPage> {
                           },
                         ),
                 ),
+
               ],
             ),
           ),
