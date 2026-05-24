@@ -884,163 +884,24 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       const SizedBox(height: 18),
-                      NeoBrutalismButton(
-                        backgroundColor: NeoBrutalismTheme.primaryContainer,
-                        onPressed: _handleExportBackup,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.backup, color: NeoBrutalismTheme.onSurface),
-                            SizedBox(width: 8),
-                            Text(
-                              "EXPORT BACKUP",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                color: NeoBrutalismTheme.onSurface,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      NeoBrutalismButton(
-                        backgroundColor: NeoBrutalismTheme.secondaryContainer,
-                        onPressed: _handleImportRestore,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.settings_backup_restore, color: NeoBrutalismTheme.onSurface),
-                            SizedBox(width: 8),
-                            Text(
-                              "IMPORT RESTORE",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                color: NeoBrutalismTheme.onSurface,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      // Tombol Reset Data Red (Nuke/Clear All Tasks)
-                      NeoBrutalismButton(
-                        backgroundColor: NeoBrutalismTheme.error, // Red
-                        onPressed: _showResetDataConfirmationDialog,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.delete_forever, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              "CLEAR ALL TASKS",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-
-                      // Visual Representation of AlertDialog (Mockup) Sesuai Stitch
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 12,
-                        ),
-                        child: Transform.rotate(
-                          angle:
-                              2 *
-                              3.141592653589793 /
-                              180, // rotate-2 (2 degrees)
-                          child: GestureDetector(
-                            onTap: _showResetDataConfirmationDialog,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                // Main Card Container dengan brutal shadow
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: NeoBrutalismTheme
-                                        .errorContainer, // Pink/light red
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: NeoBrutalismTheme.outline
-                                            .withValues(alpha: 0.5),
-                                        offset: const Offset(4, 4),
-                                        blurRadius: 0,
-                                      ),
-                                    ],
-                                  ),
-                                  child: CustomPaint(
-                                    painter: DashedBorderPainter(
-                                      color: NeoBrutalismTheme.outline,
-                                      strokeWidth: 4.0,
-                                      gap: 6.0,
-                                      dashLength: 10.0,
-                                      borderRadius: 16.0,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 18,
-                                        right: 14,
-                                        top: 14,
-                                        bottom: 14,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          const SizedBox(height: 4),
-                                          const Padding(
-                                            padding: EdgeInsets.only(
-                                              left: 16.0,
-                                            ),
-                                            child: Text(
-                                              "Yakin nih mau dihapus data-datanya? nanti ilang semua lho.",
-                                              style: TextStyle(
-                                                color: Color(
-                                                  0xFF93000A,
-                                                ), // on-error-container
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                                height: 2,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // Absolute Warning Icon Badge on Top-Left
-                                Positioned(
-                                  left: -8,
-                                  top: -8,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: NeoBrutalismTheme.surface,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: NeoBrutalismTheme.outline,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.warning,
-                                      color: NeoBrutalismTheme.error,
-                                      size: 16,
-                                    ),
+                      Transform.rotate(
+                        angle: -1.5 * 3.141592653589793 / 180, // miring kiri -1.5 derajat
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: NeoBrutalismButton(
+                            backgroundColor: NeoBrutalismTheme.primaryContainer,
+                            onPressed: _handleExportBackup,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.backup, color: NeoBrutalismTheme.onSurface),
+                                SizedBox(width: 8),
+                                Text(
+                                  "EXPORT BACKUP",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: NeoBrutalismTheme.onSurface,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ],
@@ -1048,6 +909,61 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      Transform.rotate(
+                        angle: 1.5 * 3.141592653589793 / 180, // miring kanan 1.5 derajat
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: NeoBrutalismButton(
+                            backgroundColor: NeoBrutalismTheme.secondaryContainer,
+                            onPressed: _handleImportRestore,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.settings_backup_restore, color: NeoBrutalismTheme.onSurface),
+                                SizedBox(width: 8),
+                                Text(
+                                  "IMPORT RESTORE",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: NeoBrutalismTheme.onSurface,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Tombol Reset Data Red (Nuke/Clear All Tasks)
+                      Transform.rotate(
+                        angle: -1.0 * 3.141592653589793 / 180, // miring kiri -1.0 derajat
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: NeoBrutalismButton(
+                            backgroundColor: NeoBrutalismTheme.error, // Red
+                            onPressed: _showResetDataConfirmationDialog,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.delete_forever, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  "CLEAR ALL TASKS",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
