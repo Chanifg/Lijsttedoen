@@ -112,10 +112,46 @@ Ikuti panduan berikut untuk menjalankan proyek ini di mesin lokal Anda:
      ```bash
      flutter run
      ```
-   * Untuk melakukan build APK (Android):
-     ```bash
-     flutter build apk --release
-     ```
+   * Untuk melakukan build APK rilis yang efisien (direkomendasikan):
+     Silakan lihat bagian [📦 Panduan Build APK Rilis (Android 10+)](#-panduan-build-apk-rilis-android-10) di bawah ini.
+
+---
+
+## 📦 Panduan Build APK Rilis (Android 10+)
+
+Aplikasi ini telah dikonfigurasi menggunakan batas minimum versi **Android 10 (API 29)** (`minSdk = 29`) untuk menjamin efisiensi performa terbaik, tingkat keamanan yang tinggi, serta ukuran paket yang minimal.
+
+Gunakan langkah-langkah di bawah ini untuk menghasilkan file APK dengan ukuran yang paling efisien:
+
+### 1. Build APK Terpisah per Arsitektur CPU (Sangat Direkomendasikan)
+Secara default, perintah `flutter build apk` menggabungkan semua arsitektur CPU ke dalam satu file APK yang besar (*fat APK*). Untuk membaginya agar ukurannya mengecil drastis hingga **50% lebih kecil**:
+
+```bash
+flutter build apk --split-per-abi
+```
+
+**Lokasi Hasil Build:**
+Setelah proses build selesai, buka folder:
+`build/app/outputs/flutter-apk/`
+
+Anda akan mendapatkan file APK spesifik arsitektur:
+*   `app-arm64-v8a-release.apk` (Untuk HP modern 64-bit — **gunakan ini untuk diinstal langsung ke perangkat Android 10+ Anda**)
+*   `app-armeabi-v7a-release.apk` (Untuk HP model lama 32-bit)
+
+### 2. Build Android App Bundle (AAB) untuk Google Play Store
+Jika ingin merilis aplikasi secara resmi ke Google Play Store, gunakan format `.aab` agar Google Play secara otomatis membuat APK dengan ukuran terkecil khusus untuk tipe HP pengguna yang mengunduhnya:
+
+```bash
+flutter build appbundle
+```
+
+**Lokasi Hasil Build:**
+`build/app/outputs/bundle/release/app-release.aab`
+
+### 💡 Fitur Optimasi Ukuran Tersemat (Built-in)
+Konfigurasi file `build.gradle.kts` telah dioptimalkan secara penuh untuk versi rilis dengan mengaktifkan:
+*   `isMinifyEnabled = true` : Membuang kode Java/Kotlin yang tidak terpakai dari library luar (*tree-shaking*) serta menyamarkan nama kelas.
+*   `isShrinkResources = true` : Membuang resource visual atau aset bawaan library pendukung yang tidak dipanggil di kode Anda.
 
 ---
 
