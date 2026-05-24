@@ -884,83 +884,65 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       const SizedBox(height: 18),
-                      Transform.rotate(
-                        angle: -1.5 * 3.141592653589793 / 180, // miring kiri -1.5 derajat
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: NeoBrutalismButton(
-                            backgroundColor: NeoBrutalismTheme.primaryContainer,
-                            onPressed: _handleExportBackup,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.backup, color: NeoBrutalismTheme.onSurface),
-                                SizedBox(width: 8),
-                                Text(
-                                  "EXPORT BACKUP",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: NeoBrutalismTheme.onSurface,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
+                      NeoBrutalismButton(
+                        backgroundColor: NeoBrutalismTheme.primaryContainer,
+                        onPressed: _handleExportBackup,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.backup, color: NeoBrutalismTheme.onSurface),
+                            SizedBox(width: 8),
+                            Text(
+                              "EXPORT BACKUP",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: NeoBrutalismTheme.onSurface,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Transform.rotate(
-                        angle: 1.5 * 3.141592653589793 / 180, // miring kanan 1.5 derajat
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: NeoBrutalismButton(
-                            backgroundColor: NeoBrutalismTheme.secondaryContainer,
-                            onPressed: _handleImportRestore,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.settings_backup_restore, color: NeoBrutalismTheme.onSurface),
-                                SizedBox(width: 8),
-                                Text(
-                                  "IMPORT RESTORE",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: NeoBrutalismTheme.onSurface,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
+                      const SizedBox(height: 12),
+                      NeoBrutalismButton(
+                        backgroundColor: NeoBrutalismTheme.secondaryContainer,
+                        onPressed: _handleImportRestore,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.settings_backup_restore, color: NeoBrutalismTheme.onSurface),
+                            SizedBox(width: 8),
+                            Text(
+                              "IMPORT RESTORE",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: NeoBrutalismTheme.onSurface,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
                       // Tombol Reset Data Red (Nuke/Clear All Tasks)
-                      Transform.rotate(
-                        angle: -1.0 * 3.141592653589793 / 180, // miring kiri -1.0 derajat
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: NeoBrutalismButton(
-                            backgroundColor: NeoBrutalismTheme.error, // Red
-                            onPressed: _showResetDataConfirmationDialog,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.delete_forever, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  "CLEAR ALL TASKS",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
+                      NeoBrutalismButton(
+                        backgroundColor: NeoBrutalismTheme.error, // Red
+                        onPressed: _showResetDataConfirmationDialog,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.delete_forever, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              "CLEAR ALL TASKS",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 8),
