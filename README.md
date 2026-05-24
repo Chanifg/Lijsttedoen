@@ -119,12 +119,6 @@ Ikuti panduan berikut untuk menjalankan proyek ini di mesin lokal Anda:
 
 ---
 
-## 👤 Kontributor
-
-* **Chanifg** - *Lead Developer*
-
----
-
 ## 📄 Lisensi
 
 Proyek ini dilindungi di bawah lisensi pihak pengembang. Segala kontribusi dan modifikasi diperbolehkan untuk meningkatkan produktivitas bersama.
