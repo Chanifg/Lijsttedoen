@@ -92,10 +92,6 @@ class _StatsPageState extends State<StatsPage> {
 
   // Helper untuk menentukan apakah suatu todo berstatus telat/melewati deadline/due time
   bool _isOverdue(TodoModel t) {
-    if (t.isDone) {
-      return false; // Sudah selesai tidak dianggap telat dalam rasio
-    }
-
     final String targetDateStr = t.isDeadline
         ? (t.deadlineDate ?? t.dueDate)
         : t.dueDate;
@@ -116,6 +112,18 @@ class _StatsPageState extends State<StatsPage> {
       final int minute = int.parse(timeParts[1]);
 
       final DateTime targetDateTime = DateTime(year, month, day, hour, minute);
+
+      if (t.isDone) {
+        if (t.completedAt == null) {
+          return false; // Fallback aman untuk tugas lama: tidak dianggap telat
+        }
+        try {
+          final DateTime completedDateTime = DateTime.parse(t.completedAt!);
+          return completedDateTime.isAfter(targetDateTime);
+        } catch (_) {
+          return false;
+        }
+      }
 
       return targetDateTime.isBefore(DateTime.now());
     } catch (_) {

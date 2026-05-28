@@ -9,6 +9,7 @@ class TodoModel {
   bool isDeadline;
   String? deadlineDate; // Format: 'YYYY-MM-DD'
   String? deadlineTime; // Format: 'HH:MM'
+  String? completedAt;  // Format: ISO 8601 String
 
   TodoModel({
     required this.id,
@@ -21,6 +22,7 @@ class TodoModel {
     this.isDeadline = false,
     this.deadlineDate,
     this.deadlineTime,
+    this.completedAt,
   }) : dueDate = dueDate ?? _getTodayDateString();
 
   static String _getTodayDateString() {
@@ -41,6 +43,7 @@ class TodoModel {
       'isDeadline': isDeadline ? 1 : 0,
       'deadlineDate': deadlineDate,
       'deadlineTime': deadlineTime,
+      'completedAt': completedAt,
     };
   }
 
@@ -57,6 +60,7 @@ class TodoModel {
       isDeadline: map['isDeadline'] == null ? false : (map['isDeadline'] as int) == 1,
       deadlineDate: map['deadlineDate'] as String?,
       deadlineTime: map['deadlineTime'] as String?,
+      completedAt: map['completedAt'] as String?,
     );
   }
 }

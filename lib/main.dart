@@ -143,6 +143,7 @@ class _MainShellState extends State<MainShell> {
   void _toggleTodo(TodoModel todo) {
     setState(() {
       todo.isDone = !todo.isDone;
+      todo.completedAt = todo.isDone ? DateTime.now().toIso8601String() : null;
     });
     _saveTodos();
 
