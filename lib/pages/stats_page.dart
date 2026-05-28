@@ -226,6 +226,9 @@ class _StatsPageState extends State<StatsPage> {
     final doneCount = periodTodos.where((t) => t.isDone).length;
     final activeCount = total - doneCount;
 
+    // Menghitung tugas yang diselesaikan tepat waktu (selesai dan tidak terlambat)
+    final onTimeCount = periodTodos.where((t) => t.isDone && !_isOverdue(t)).length;
+
     // Menghitung jumlah sukses berdasarkan aturan: dianggap sukses jika tidak melewati deadline
     final overdueCount = periodTodos.where((t) => _isOverdue(t)).length;
     final suksesCount = total - overdueCount;
@@ -752,7 +755,7 @@ class _StatsPageState extends State<StatsPage> {
                                               ),
                                         ),
                                         Text(
-                                          "$doneCount Tugas",
+                                          "$onTimeCount Tugas",
                                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                 fontWeight: FontWeight.w900,
                                               ),
