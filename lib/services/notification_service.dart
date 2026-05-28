@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -15,8 +17,16 @@ class NotificationService {
       'notifications_reminder_offset'; // dalam menit (0, 15, 60)
   static const String _keyDailyDigestEnabled = 'notifications_daily_digest';
 
+  /// Cek apakah platform mendukung local notifications (Android, iOS, macOS)
+  static bool get _isSupportedPlatform {
+    if (kIsWeb) return false;
+    return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+  }
+
   /// Inisialisasi Service Notifikasi
   static Future<void> init() async {
+    if (!_isSupportedPlatform) return;
+
     // 1. Inisialisasi Zona Waktu Lokal
     tz.initializeTimeZones();
     try {
@@ -58,6 +68,7 @@ class NotificationService {
 
   /// Request Izin Notifikasi untuk Android 13+ dan iOS
   static Future<bool> requestPermissions() async {
+    if (!_isSupportedPlatform) return false;
     // Request untuk Android (wajib Android 13+)
     final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
         _notifications
@@ -129,6 +140,7 @@ class NotificationService {
 
   /// Sinkronisasi jadwal Daily Digest jam 08.00 pagi
   static Future<void> syncDailyDigest() async {
+    if (!_isSupportedPlatform) return;
     await _notifications.cancel(id: 999); // Bersihkan sisa alarm daily digest
 
     if (!await isEnabled() || !await isDailyDigestEnabled()) return;
@@ -171,6 +183,7 @@ class NotificationService {
 
   /// Jadwalkan pengingat alarm untuk satu Tugas/Todo
   static Future<void> scheduleTodoReminder(TodoModel todo) async {
+    if (!_isSupportedPlatform) return;
     // Hapus sisa jadwal notifikasi yang lama agar tidak duplikat
     await cancelTodoReminder(todo.id);
 
@@ -294,17 +307,20 @@ class NotificationService {
 
   /// Batalkan notifikasi untuk satu Tugas
   static Future<void> cancelTodoReminder(int todoId) async {
+    if (!_isSupportedPlatform) return;
     await _notifications.cancel(id: todoId);
     await _notifications.cancel(id: todoId + 10000);
   }
 
   /// Batalkan seluruh alarm terjadwal (misal saat fitur dinonaktifkan)
   static Future<void> cancelAllReminders() async {
+    if (!_isSupportedPlatform) return;
     await _notifications.cancelAll();
   }
 
   /// Tes Notifikasi Instan untuk pembuktian fungsionalitas
   static Future<void> testInstantNotification() async {
+    if (!_isSupportedPlatform) return;
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
           'test_channel',
