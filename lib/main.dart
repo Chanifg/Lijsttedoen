@@ -53,6 +53,15 @@ class _MainShellState extends State<MainShell> {
   bool _isLoading = true;
   late Isar _isar;
 
+  // Helper aman untuk mengecek apakah sedang berjalan di lingkungan testing
+  bool get _isTest {
+    try {
+      return Platform.environment.containsKey('FLUTTER_TEST');
+    } catch (_) {
+      return false; // Mengembalikan false secara aman pada HP Android/iOS
+    }
+  }
+
   // Data Dummy Awal (FR-01)
   final List<TodoModel> _dummyTodos = [
     TodoModel(
@@ -93,8 +102,8 @@ class _MainShellState extends State<MainShell> {
     final String? name = prefs.getString('user_name');
     final String? avatar = prefs.getString('user_avatar');
 
-    // Bypass Isar dalam lingkungan pengujian widget untuk menghindari ketergantungan native
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    // Bypass Isar dalam lingkungan pengujian widget untuk menghindari ketergantungan native secara aman
+    if (_isTest) {
       setState(() {
         _userName = name ?? "Pengguna";
         _avatarType = avatar ?? "initial";
@@ -174,7 +183,7 @@ class _MainShellState extends State<MainShell> {
       deadlineTime: deadlineTime,
     );
 
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!_isTest) {
       await _isar.writeTxn(() async {
         await _isar.todoModels.put(newTodo);
       });
@@ -200,7 +209,7 @@ class _MainShellState extends State<MainShell> {
       todo.completedAt = todo.isDone ? DateTime.now().toIso8601String() : null;
     });
 
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!_isTest) {
       await _isar.writeTxn(() async {
         await _isar.todoModels.put(todo);
       });
@@ -229,7 +238,7 @@ class _MainShellState extends State<MainShell> {
       todo.deadlineTime = deadlineTime;
     });
 
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!_isTest) {
       await _isar.writeTxn(() async {
         await _isar.todoModels.put(todo);
       });
@@ -247,7 +256,7 @@ class _MainShellState extends State<MainShell> {
 
   // Hapus/Delete Todo (FR-04)
   void _deleteTodo(TodoModel todo) async {
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!_isTest) {
       await _isar.writeTxn(() async {
         await _isar.todoModels.delete(todo.id);
       });
@@ -288,7 +297,7 @@ class _MainShellState extends State<MainShell> {
   Future<void> _clearAllData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!_isTest) {
       await _isar.writeTxn(() async {
         await _isar.todoModels.clear();
       });
