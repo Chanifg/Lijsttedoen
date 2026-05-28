@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:isar/isar.dart';
 import 'notification_service.dart';
 import '../models/todo_model.dart';
 
@@ -12,9 +13,14 @@ class BackupService {
   static Future<bool> exportBackup() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final isar = Isar.getInstance();
+      if (isar == null) return false;
 
-      // 1. Ambil seluruh data dari SharedPreferences
-      final String? todosList = prefs.getString('todos_list');
+      // 1. Ambil seluruh data dari Isar dan setelan dari SharedPreferences
+      final todos = await isar.todoModels.where().findAll();
+      final List<Map<String, dynamic>> todosMapList = todos.map((t) => t.toMap()).toList();
+      final String todosListJson = json.encode(todosMapList);
+
       final String? userName = prefs.getString('user_name');
       final String? userAvatar = prefs.getString('user_avatar');
       final bool notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
@@ -27,7 +33,7 @@ class BackupService {
         'version': 1,
         'backup_date': DateTime.now().toIso8601String(),
         'data': {
-          'todos_list': todosList,
+          'todos_list': todosListJson,
           'user_name': userName,
           'user_avatar': userAvatar,
           'notifications_enabled': notificationsEnabled,
@@ -105,12 +111,11 @@ class BackupService {
 
       final Map<String, dynamic> data = backupMap['data'] as Map<String, dynamic>;
 
-      // 3. Tulis data yang valid ke SharedPreferences
+      // 3. Tulis data yang valid ke SharedPreferences & Isar
       final prefs = await SharedPreferences.getInstance();
+      final isar = Isar.getInstance();
+      if (isar == null) return 'Database tidak siap.';
 
-      if (data['todos_list'] != null) {
-        await prefs.setString('todos_list', data['todos_list'] as String);
-      }
       if (data['user_name'] != null) {
         await prefs.setString('user_name', data['user_name'] as String);
       }
@@ -127,22 +132,35 @@ class BackupService {
         await prefs.setBool('notifications_daily_digest', data['notifications_daily_digest'] as bool);
       }
 
-      // 4. Jadwalkan ulang seluruh alarm notifikasi untuk data baru
-      await NotificationService.cancelAllReminders();
+      // Pastikan flag migrasi diset true dan bersihkan data lama SharedPreferences
+      await prefs.setBool('migrated_to_isar', true);
+      await prefs.remove('todos_list');
 
+      // 4. Hapus data Isar saat ini dan masukkan data baru
+      List<TodoModel> todos = [];
       if (data['todos_list'] != null) {
         final String todosJson = data['todos_list'] as String;
         final List<dynamic> decodedTodos = json.decode(todosJson);
-        final List<TodoModel> todos = decodedTodos.map((item) => TodoModel.fromMap(item)).toList();
+        todos = decodedTodos.map((item) => TodoModel.fromMap(item)).toList();
+      }
 
-        for (var todo in todos) {
-          if (!todo.isDone) {
-            await NotificationService.scheduleTodoReminder(todo);
-          }
+      await isar.writeTxn(() async {
+        await isar.todoModels.clear();
+        if (todos.isNotEmpty) {
+          await isar.todoModels.putAll(todos);
+        }
+      });
+
+      // 5. Jadwalkan ulang seluruh alarm notifikasi untuk data baru
+      await NotificationService.cancelAllReminders();
+
+      for (var todo in todos) {
+        if (!todo.isDone) {
+          await NotificationService.scheduleTodoReminder(todo);
         }
       }
 
-      // 5. Sinkronisasi Daily Digest notifikasi
+      // 6. Sinkronisasi Daily Digest notifikasi
       await NotificationService.syncDailyDigest();
 
       return null; // Mengembalikan null jika sukses (tidak ada pesan error)

@@ -1,36 +1,46 @@
+import 'package:isar/isar.dart';
+
+part 'todo_model.g.dart';
+
+@collection
 class TodoModel {
-  final int id;
+  Id id; // Isar ID (int)
+
   String title;
   String description;
   bool isDone;
-  String dueTime;     // Format: 'HH:MM'
-  String dueDate;     // Format: 'YYYY-MM-DD'
-  String category;    // Pilihan: 'Work', 'Personal', 'Study'
+  String dueTime;
+  String dueDate;
+  String category;
   bool isDeadline;
-  String? deadlineDate; // Format: 'YYYY-MM-DD'
-  String? deadlineTime; // Format: 'HH:MM'
-  String? completedAt;  // Format: ISO 8601 String
+  String? deadlineDate;
+  String? deadlineTime;
+  String? completedAt;
 
   TodoModel({
-    required this.id,
+    this.id = Isar.autoIncrement,
     required this.title,
     required this.description,
     this.isDone = false,
     this.dueTime = '12:00',
-    String? dueDate,
+    this.dueDate = '',
     this.category = 'Work',
     this.isDeadline = false,
     this.deadlineDate,
     this.deadlineTime,
     this.completedAt,
-  }) : dueDate = dueDate ?? _getTodayDateString();
+  }) {
+    if (dueDate.isEmpty) {
+      dueDate = _getTodayDateString();
+    }
+  }
 
   static String _getTodayDateString() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
   }
 
-  // Konversi ke Map untuk disimpan ke SharedPreferences
+  // Konversi ke Map untuk disimpan ke SharedPreferences / Backup
   Map<String, dynamic> toMap() {
     return {
       'id': id,

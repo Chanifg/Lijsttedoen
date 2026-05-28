@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:lijsttedoen/models/todo_model.dart';
 import 'package:lijsttedoen/theme/neo_brutalism_theme.dart';
@@ -48,6 +51,7 @@ class _MainShellState extends State<MainShell> {
   String _userName = "Pengguna";
   String _avatarType = "initial"; // Pilihan avatar global: initial, face, pets, bunny
   bool _isLoading = true;
+  late Isar _isar;
 
   // Data Dummy Awal (FR-01)
   final List<TodoModel> _dummyTodos = [
@@ -83,40 +87,80 @@ class _MainShellState extends State<MainShell> {
     _loadAppState();
   }
 
-  // Load data dari SharedPreferences (FR-02)
+  // Load data dari SharedPreferences & Isar (FR-02)
   Future<void> _loadAppState() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? todosJson = prefs.getString('todos_list');
     final String? name = prefs.getString('user_name');
     final String? avatar = prefs.getString('user_avatar');
+
+    // Bypass Isar dalam lingkungan pengujian widget untuk menghindari ketergantungan native
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      setState(() {
+        _userName = name ?? "Pengguna";
+        _avatarType = avatar ?? "initial";
+        _todos = List.from(_dummyTodos);
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // 1. Inisialisasi Isar
+    if (Isar.getInstance() == null) {
+      final dir = await getApplicationDocumentsDirectory();
+      _isar = await Isar.open(
+        [TodoModelSchema],
+        directory: dir.path,
+      );
+    } else {
+      _isar = Isar.getInstance()!;
+    }
+
+    // 2. Jalankan Migrasi Otomatis Data Lama ke Isar (jika ada)
+    final bool hasMigrated = prefs.getBool('migrated_to_isar') ?? false;
+    if (!hasMigrated) {
+      final String? todosJson = prefs.getString('todos_list');
+      if (todosJson != null) {
+        try {
+          final List<dynamic> decoded = json.decode(todosJson);
+          final List<TodoModel> oldTodos = decoded.map((item) => TodoModel.fromMap(item)).toList();
+          if (oldTodos.isNotEmpty) {
+            await _isar.writeTxn(() async {
+              await _isar.todoModels.putAll(oldTodos);
+            });
+          }
+        } catch (e) {
+          debugPrint("Failed to migrate old SharedPreferences data: $e");
+        }
+      }
+      await prefs.setBool('migrated_to_isar', true);
+    }
+
+    // 3. Baca data dari Isar
+    final totalCount = await _isar.todoModels.count();
+    if (totalCount == 0) {
+      // Jika Isar kosong, gunakan data dummy bawaan
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.putAll(_dummyTodos);
+      });
+    }
+
+    final todosFromIsar = await _isar.todoModels.where().findAll();
 
     setState(() {
       _userName = name ?? "Pengguna";
       _avatarType = avatar ?? "initial";
-
-      if (todosJson != null) {
-        final List<dynamic> decoded = json.decode(todosJson);
-        _todos = decoded.map((item) => TodoModel.fromMap(item)).toList();
-      } else {
-        // Jika data kosong, gunakan data dummy bawaan
-        _todos = List.from(_dummyTodos);
-        _saveTodos();
-      }
+      _todos = todosFromIsar;
       _isLoading = false;
     });
   }
 
   // Simpan data Todos ke SharedPreferences (FR-02)
   Future<void> _saveTodos() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> todosMap =
-        _todos.map((todo) => todo.toMap()).toList();
-    final String encoded = json.encode(todosMap);
-    await prefs.setString('todos_list', encoded);
+    // Data disimpan secara riil di database Isar pada setiap transaksi CRUD
   }
 
   // Tambah Todo baru (FR-03)
-  void _addTodo(String title, String description, String dueTime, String dueDate, String category, bool isDeadline, String? deadlineDate, String? deadlineTime) {
+  void _addTodo(String title, String description, String dueTime, String dueDate, String category, bool isDeadline, String? deadlineDate, String? deadlineTime) async {
     final int newId = _todos.isNotEmpty ? _todos.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1 : 1;
     final newTodo = TodoModel(
       id: newId,
@@ -130,9 +174,19 @@ class _MainShellState extends State<MainShell> {
       deadlineTime: deadlineTime,
     );
 
-    setState(() {
-      _todos.add(newTodo);
-    });
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.put(newTodo);
+      });
+      final updatedTodos = await _isar.todoModels.where().findAll();
+      setState(() {
+        _todos = updatedTodos;
+      });
+    } else {
+      setState(() {
+        _todos.add(newTodo);
+      });
+    }
     _saveTodos();
     
     // Jadwalkan pengingat notifikasi untuk tugas baru
@@ -140,11 +194,18 @@ class _MainShellState extends State<MainShell> {
   }
 
   // Toggle status Todo (FR-03 & FR-04)
-  void _toggleTodo(TodoModel todo) {
+  void _toggleTodo(TodoModel todo) async {
     setState(() {
       todo.isDone = !todo.isDone;
       todo.completedAt = todo.isDone ? DateTime.now().toIso8601String() : null;
     });
+
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.put(todo);
+      });
+    }
+
     _saveTodos();
 
     // Jika selesai, batalkan notifikasinya. Jika belum, jadwalkan pengingat kembali.
@@ -156,7 +217,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   // Edit/Update Todo (FR-03)
-  void _editTodo(TodoModel todo, String title, String description, String dueTime, String dueDate, String category, bool isDeadline, String? deadlineDate, String? deadlineTime) {
+  void _editTodo(TodoModel todo, String title, String description, String dueTime, String dueDate, String category, bool isDeadline, String? deadlineDate, String? deadlineTime) async {
     setState(() {
       todo.title = title;
       todo.description = description;
@@ -167,6 +228,13 @@ class _MainShellState extends State<MainShell> {
       todo.deadlineDate = deadlineDate;
       todo.deadlineTime = deadlineTime;
     });
+
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.put(todo);
+      });
+    }
+
     _saveTodos();
 
     // Jadwalkan ulang notifikasi dengan waktu baru (jika belum selesai)
@@ -178,10 +246,20 @@ class _MainShellState extends State<MainShell> {
   }
 
   // Hapus/Delete Todo (FR-04)
-  void _deleteTodo(TodoModel todo) {
-    setState(() {
-      _todos.removeWhere((t) => t.id == todo.id);
-    });
+  void _deleteTodo(TodoModel todo) async {
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.delete(todo.id);
+      });
+      final updatedTodos = await _isar.todoModels.where().findAll();
+      setState(() {
+        _todos = updatedTodos;
+      });
+    } else {
+      setState(() {
+        _todos.removeWhere((t) => t.id == todo.id);
+      });
+    }
     _saveTodos();
 
     // Batalkan notifikasi dari alarm lokal
@@ -209,6 +287,13 @@ class _MainShellState extends State<MainShell> {
   // Hapus semua data (FR-11 & FR-12)
   Future<void> _clearAllData() async {
     final prefs = await SharedPreferences.getInstance();
+
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await _isar.writeTxn(() async {
+        await _isar.todoModels.clear();
+      });
+    }
+
     setState(() {
       _todos.clear();
       _userName = "Pengguna";
@@ -217,6 +302,7 @@ class _MainShellState extends State<MainShell> {
     await prefs.remove('todos_list');
     await prefs.remove('user_name');
     await prefs.remove('user_avatar');
+    await prefs.setBool('migrated_to_isar', true);
 
     // Batalkan seluruh pengingat notifikasi yang dijadwalkan
     await NotificationService.cancelAllReminders();
