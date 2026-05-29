@@ -16,6 +16,9 @@ class NotificationService {
   static const String _keyReminderOffset =
       'notifications_reminder_offset'; // dalam menit (0, 15, 60)
   static const String _keyDailyDigestEnabled = 'notifications_daily_digest';
+  static const String _keyNotificationSoundType = 'notification_sound_type';
+  static const String _keyCustomSoundPath = 'notification_custom_sound_path';
+  static const String _keyCustomSoundName = 'notification_custom_sound_name';
 
   /// Cek apakah platform mendukung local notifications (Android, iOS, macOS)
   static bool get _isSupportedPlatform {
@@ -136,6 +139,38 @@ class NotificationService {
     await syncDailyDigest();
   }
 
+  static Future<String> getSoundType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyNotificationSoundType) ?? 'default';
+  }
+
+  static Future<void> setSoundType(String type) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyNotificationSoundType, type);
+  }
+
+  static Future<String?> getCustomSoundPath() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyCustomSoundPath);
+  }
+
+  static Future<String?> getCustomSoundName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyCustomSoundName);
+  }
+
+  static Future<void> saveCustomSound(String path, String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyCustomSoundPath, path);
+    await prefs.setString(_keyCustomSoundName, name);
+  }
+
+  static Future<void> clearCustomSound() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyCustomSoundPath);
+    await prefs.remove(_keyCustomSoundName);
+  }
+
   // --- LOGIKA UTAMA ALARM & JADWAL NOTIFIKASI ---
 
   /// Sinkronisasi jadwal Daily Digest jam 08.00 pagi
@@ -214,6 +249,37 @@ class NotificationService {
 
       final DateTime targetDateTime = DateTime(year, month, day, hour, minute);
 
+      // Load sound configuration
+      final String soundType = await getSoundType();
+      final String? customSoundPath = await getCustomSoundPath();
+
+      String channelId = 'todo_reminders_channel_v3';
+      String channelName = 'Pengingat Tugas';
+      AndroidNotificationSound? androidSound;
+      String? iosSound;
+
+      if (soundType == 'retro') {
+        channelId = 'todo_reminders_channel_retro_v3';
+        channelName = 'Pengingat Tugas (Retro)';
+        androidSound = const RawResourceAndroidNotificationSound('retro');
+        iosSound = 'retro.caf';
+      } else if (soundType == 'digital') {
+        channelId = 'todo_reminders_channel_digital_v3';
+        channelName = 'Pengingat Tugas (Digital)';
+        androidSound = const RawResourceAndroidNotificationSound('digital');
+        iosSound = 'digital.caf';
+      } else if (soundType == 'joyful') {
+        channelId = 'todo_reminders_channel_joyful_v3';
+        channelName = 'Pengingat Tugas (Joyful)';
+        androidSound = const RawResourceAndroidNotificationSound('joyful');
+        iosSound = 'joyful.caf';
+      } else if (soundType == 'custom' && customSoundPath != null) {
+        channelId = 'todo_reminders_channel_custom_v3';
+        channelName = 'Pengingat Tugas (Kustom)';
+        androidSound = UriAndroidNotificationSound(customSoundPath);
+        iosSound = customSoundPath.split('/').last;
+      }
+
       // 3. Jadwalkan notifikasi TEPAT WAKTU (exact due time) jika berada di masa depan
       if (targetDateTime.isAfter(DateTime.now())) {
         final tz.TZDateTime scheduledDate = tz.TZDateTime.from(
@@ -231,22 +297,25 @@ class NotificationService {
           scheduledDate: scheduledDate,
           notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
-              'todo_reminders_channel',
-              'Pengingat Tugas',
+              channelId,
+              channelName,
               channelDescription:
                   'Notifications for approaching todo items and deadlines',
               importance: Importance.max,
               priority: Priority.high,
+              sound: androidSound,
+              playSound: true,
               styleInformation: BigTextStyleInformation(
                 todo.isDeadline
                     ? 'Batas waktu pengerjaan tugas "${todo.title}" telah habis!'
                     : 'Tugas "${todo.title}" dijadwalkan untuk dikerjakan sekarang!',
               ),
             ),
-            iOS: const DarwinNotificationDetails(
+            iOS: DarwinNotificationDetails(
               presentAlert: true,
               presentBadge: true,
               presentSound: true,
+              sound: iosSound,
             ),
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -275,22 +344,25 @@ class NotificationService {
             scheduledDate: scheduledReminderDate,
             notificationDetails: NotificationDetails(
               android: AndroidNotificationDetails(
-                'todo_pre_reminders_channel',
-                'Pra-Pengingat Tugas',
+                '${channelId}_pre',
+                '$channelName (Pra)',
                 channelDescription:
                     'Notifications for approaching todo items and deadlines (pre-reminders)',
                 importance: Importance.max,
                 priority: Priority.high,
+                sound: androidSound,
+                playSound: true,
                 styleInformation: BigTextStyleInformation(
                   todo.isDeadline
                       ? 'Tugas "${todo.title}" memiliki batas deadline jam $targetTimeStr hari ini!'
                       : 'Tugas "${todo.title}" dijadwalkan untuk dikerjakan jam $targetTimeStr!',
                 ),
               ),
-              iOS: const DarwinNotificationDetails(
+              iOS: DarwinNotificationDetails(
                 presentAlert: true,
                 presentBadge: true,
                 presentSound: true,
+                sound: iosSound,
               ),
             ),
             androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -340,6 +412,63 @@ class NotificationService {
       title: '🎉 Notifikasi Berfungsi!',
       body:
           'Pengingat Lijsttedoen Anda telah diatur dan diaktifkan dengan sempurna.',
+      notificationDetails: details,
+    );
+  }
+
+  /// Tes Notifikasi Instan dengan Suara Tertentu untuk pembuktian fungsionalitas
+  static Future<void> testCustomNotification(String soundType, String? customSoundPath) async {
+    if (!_isSupportedPlatform) return;
+
+    String channelId = 'test_channel_v3';
+    String channelName = 'Tes Notifikasi';
+    AndroidNotificationSound? androidSound;
+    String? iosSound;
+
+    if (soundType == 'retro') {
+      channelId = 'test_channel_retro_v3';
+      channelName = 'Tes Notifikasi (Retro)';
+      androidSound = const RawResourceAndroidNotificationSound('retro');
+      iosSound = 'retro.caf';
+    } else if (soundType == 'digital') {
+      channelId = 'test_channel_digital_v3';
+      channelName = 'Tes Notifikasi (Digital)';
+      androidSound = const RawResourceAndroidNotificationSound('digital');
+      iosSound = 'digital.caf';
+    } else if (soundType == 'joyful') {
+      channelId = 'test_channel_joyful_v3';
+      channelName = 'Tes Notifikasi (Joyful)';
+      androidSound = const RawResourceAndroidNotificationSound('joyful');
+      iosSound = 'joyful.caf';
+    } else if (soundType == 'custom' && customSoundPath != null) {
+      channelId = 'test_channel_custom_v3';
+      channelName = 'Tes Notifikasi (Kustom)';
+      androidSound = UriAndroidNotificationSound(customSoundPath);
+      iosSound = customSoundPath.split('/').last;
+    }
+
+    final NotificationDetails details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        channelId,
+        channelName,
+        channelDescription: 'Channel for instant functional testing',
+        importance: Importance.max,
+        priority: Priority.high,
+        sound: androidSound,
+        playSound: true,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        sound: iosSound,
+      ),
+    );
+
+    await _notifications.show(
+      id: 888,
+      title: '🎉 Uji Coba Nada Notifikasi!',
+      body: 'Nada pilihan Anda berfungsi dengan sempurna.',
       notificationDetails: details,
     );
   }
